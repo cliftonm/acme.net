@@ -61,7 +61,7 @@ namespace Oocx.ACME.Client
 
             var request = new NewRegistrationRequest()
             {                            
-                Contact = contact,
+                //Contact = contact,
                 Agreement = termsOfServiceUri
             };
 
@@ -101,7 +101,7 @@ namespace Oocx.ACME.Client
 
             var registration = new UpdateRegistrationRequest()
             {                
-                Contact = contact,
+                //Contact = contact,
                 Agreement = termsOfServiceUri
             };
 

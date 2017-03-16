@@ -12,137 +12,137 @@ using static Oocx.ACME.Common.Log;
 
 namespace Oocx.ACME.IIS
 {
-    public class IISServerConfigurationProvider : IServerConfigurationProvider
-    {
-        private readonly ServerManager manager;
+	public class IISServerConfigurationProvider : IServerConfigurationProvider
+	{
+		private readonly ServerManager manager;
 
-        public IISServerConfigurationProvider()
-        {
-            manager = new ServerManager();
-        }
+		public IISServerConfigurationProvider()
+		{
+			manager = new ServerManager();
+		}
 
-        public byte[] InstallCertificateWithPrivateKey(string certificatePath, string certificateStoreName, RSAParameters privateKey)
-        {            
-            var certificateBytes = File.ReadAllBytes(certificatePath);
-            var x509 = new X509Certificate2(certificateBytes, (string)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
-            var csp = new CspParameters { KeyContainerName = x509.GetCertHashString(), Flags = CspProviderFlags.UseMachineKeyStore };
-            var rsa = new RSACryptoServiceProvider(csp);
-            rsa.ImportParameters(privateKey);
-            x509.PrivateKey = rsa;
+		public byte[] InstallCertificateWithPrivateKey(string certificatePath, string certificateStoreName, RSAParameters privateKey)
+		{
+			var certificateBytes = File.ReadAllBytes(certificatePath);
+			var x509 = new X509Certificate2(certificateBytes, (string)null, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+			var csp = new CspParameters { KeyContainerName = x509.GetCertHashString(), Flags = CspProviderFlags.UseMachineKeyStore };
+			var rsa = new RSACryptoServiceProvider(csp);
+			rsa.ImportParameters(privateKey);
+			x509.PrivateKey = rsa;
 
-            Info($"Installing certificate private key to localmachine\\{certificateStoreName}, container name {csp.KeyContainerName}");
+			Info($"Installing certificate private key to localmachine\\{certificateStoreName}, container name {csp.KeyContainerName}");
 
-            InstallCertificateToStore(x509, certificateStoreName);
-            return x509.GetCertHash();
-        }
+			InstallCertificateToStore(x509, certificateStoreName);
+			return x509.GetCertHash();
+		}
 
-        public void ConfigureServer(string domain, byte[] certificateHash, string certificateStoreName, string siteName, string binding)
-        {
-            Info($"configuring IIS to use the new certificate for {domain}");
-            
-            var site = GetWebSite(domain, siteName);
-            if (site == null)
-            {
-                return;
-            }
+		public void ConfigureServer(string domain, byte[] certificateHash, string certificateStoreName, string siteName, string binding)
+		{
+			Info($"configuring IIS to use the new certificate for {domain}");
 
-            ConfigureBindings(site, certificateHash, certificateStoreName, binding, domain);
-        }
+			var site = GetWebSite(domain, siteName);
+			if (site == null)
+			{
+				return;
+			}
 
-        private Site GetWebSite(string domain, string siteName)
-        {
-            Site site;
-            if (siteName == null)
-            {
-                site = manager.GetSiteForDomain(domain);
-                if (site == null)
-                {
-                    Error($"IIS Web Site with binding for domain {domain} not found, cannot configure IIS.");
-                    return null;
-                }
-            }
-            else
-            {
-                site = manager.Sites[siteName];
-                if (site == null)
-                {
-                    Error($"IIS Web Site {siteName} not found, cannot configure IIS.");
-                    return null;
-                }
-            }
-            return site;
-        }
+			ConfigureBindings(site, certificateHash, certificateStoreName, binding, domain);
+		}
 
-        private void ConfigureBindings(Site site, byte[] certificateHash, string certificateStoreName, string binding, string domain)
-        {
-            Binding[] httpsBindings;
-            if (binding != null)
-            {
-                httpsBindings = site.Bindings.Where(b => b.BindingInformation == binding).ToArray();
-            }
-            else
-            {
-                httpsBindings = site.Bindings
-                    .Where(
-                        b =>
-                            string.Equals(domain, b.Host, StringComparison.OrdinalIgnoreCase) &&
-                            "https".Equals(b.Protocol, StringComparison.OrdinalIgnoreCase))
-                    .ToArray();
-            }
+		private Site GetWebSite(string domain, string siteName)
+		{
+			Site site;
+			if (siteName == null)
+			{
+				site = manager.GetSiteForDomain(domain);
+				if (site == null)
+				{
+					Error($"IIS Web Site with binding for domain {domain} not found, cannot configure IIS.");
+					return null;
+				}
+			}
+			else
+			{
+				site = manager.Sites[siteName];
+				if (site == null)
+				{
+					Error($"IIS Web Site {siteName} not found, cannot configure IIS.");
+					return null;
+				}
+			}
+			return site;
+		}
 
-            if (!httpsBindings.Any())
-            {
-                AddNewHttpsBinding(certificateHash, certificateStoreName, site, domain);
-            }
-            else
-            {
-                UpdateExistingBindings(certificateHash, certificateStoreName, site, httpsBindings);
-            }
-        }
+		private void ConfigureBindings(Site site, byte[] certificateHash, string certificateStoreName, string binding, string domain)
+		{
+			Binding[] httpsBindings;
+			if (binding != null)
+			{
+				httpsBindings = site.Bindings.Where(b => b.BindingInformation == binding).ToArray();
+			}
+			else
+			{
+				httpsBindings = site.Bindings
+					.Where(
+						b =>
+							string.Equals(domain, b.Host, StringComparison.OrdinalIgnoreCase) &&
+							"https".Equals(b.Protocol, StringComparison.OrdinalIgnoreCase))
+					.ToArray();
+			}
 
-        private void InstallCertificateToStore(X509Certificate2 certificate,  string certificateStoreName)
-        {
-            var hash = certificate.GetCertHashString();
+			if (!httpsBindings.Any())
+			{
+				AddNewHttpsBinding(certificateHash, certificateStoreName, site, domain);
+			}
+			else
+			{
+				UpdateExistingBindings(certificateHash, certificateStoreName, site, httpsBindings);
+			}
+		}
 
-            var store = new X509Store(certificateStoreName, StoreLocation.LocalMachine);            
-            store.Open(OpenFlags.OpenExistingOnly | OpenFlags.ReadWrite); 
-            if (store.Certificates.OfType<X509Certificate2>()
-                .Any(
-                    c =>
-                        c.Subject == certificate.Subject &&
-                        c.HasPrivateKey &&                        
-                        string.Equals(c.GetCertHashString(), hash, StringComparison.OrdinalIgnoreCase)))
-            {
-                Info($"the certificate with subject {certificate.Subject} and hash {hash} is already installed in store LocalMachine\\{certificateStoreName}");
-                store.Close();
-                return;
-            }
+		private void InstallCertificateToStore(X509Certificate2 certificate, string certificateStoreName)
+		{
+			var hash = certificate.GetCertHashString();
 
-            Info($"Installing certificate with subject {certificate.Subject} and hash {hash} to store LocalMachine\\{certificateStoreName}");
-            
-            store.Add(certificate);
-            store.Close();
-        }
+			var store = new X509Store(certificateStoreName, StoreLocation.LocalMachine);
+			store.Open(OpenFlags.OpenExistingOnly | OpenFlags.ReadWrite);
+			if (store.Certificates.OfType<X509Certificate2>()
+				.Any(
+					c =>
+						c.Subject == certificate.Subject &&
+						c.HasPrivateKey &&
+						string.Equals(c.GetCertHashString(), hash, StringComparison.OrdinalIgnoreCase)))
+			{
+				Info($"the certificate with subject {certificate.Subject} and hash {hash} is already installed in store LocalMachine\\{certificateStoreName}");
+				store.Close();
+				return;
+			}
 
-        private void UpdateExistingBindings(byte[] certificateHash, string certificateStoreName, Site site, IEnumerable<Binding> httpsBindings)
-        {
-            foreach (var httpsBinding in httpsBindings)
-            {
-                Info($"updating existing binding {httpsBinding.BindingInformation} in site {site.Name}");
-                httpsBinding.CertificateHash = certificateHash;
-                httpsBinding.CertificateStoreName = certificateStoreName;                
-            }            
+			Info($"Installing certificate with subject {certificate.Subject} and hash {hash} to store LocalMachine\\{certificateStoreName}");
 
-            manager.CommitChanges();
-        }
+			store.Add(certificate);
+			store.Close();
+		}
 
-        private void AddNewHttpsBinding(byte[] certificateHash, string certificateStoreName, Site site, string domain)
-        {
-            var bindingInformation = $"*:443:{domain}";
-            Info($"adding new binding {bindingInformation} to site {site.Name}");
-            var binding = site.Bindings.Add(bindingInformation, certificateHash, certificateStoreName);
-            binding.SetAttributeValue("sslFlags", 1);
-            manager.CommitChanges();
-        }
-    }
+		private void UpdateExistingBindings(byte[] certificateHash, string certificateStoreName, Site site, IEnumerable<Binding> httpsBindings)
+		{
+			foreach (var httpsBinding in httpsBindings)
+			{
+				Info($"updating existing binding {httpsBinding.BindingInformation} in site {site.Name}");
+				httpsBinding.CertificateHash = certificateHash;
+				httpsBinding.CertificateStoreName = certificateStoreName;
+			}
+
+			manager.CommitChanges();
+		}
+
+		private void AddNewHttpsBinding(byte[] certificateHash, string certificateStoreName, Site site, string domain)
+		{
+			var bindingInformation = $"*:443:{domain}";
+			Info($"adding new binding {bindingInformation} to site {site.Name}");
+			var binding = site.Bindings.Add(bindingInformation, certificateHash, certificateStoreName);
+			binding.SetAttributeValue("sslFlags", 1);
+			manager.CommitChanges();
+		}
+	}
 }

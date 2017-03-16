@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AE526AAF-CECB-4244-A202-1CE255DFCEF1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Oocx.ACME</RootNamespace>
+    <AssemblyName>Oocx.ACME</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <UseMSBuildEngine>false</UseMSBuildEngine>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\..\..\..\..\..\root\.nuget\packages\FSharp.Compiler.Tools\4.0.0.1\tools\FSharp.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FileKeyStore.cs" />
+    <Compile Include="Services\IKeyStore.cs" />
+    <Compile Include="Services\IServerConfigurationProvider.cs" />
+    <Compile Include="Services\KeyContainerStore.cs" />
+    <Compile Include="Services\KeyExport.cs" />
+    <Compile Include="Services\ManualServerConfigurationProvider.cs" />
+    <Compile Include="Services\RSAExtensions.cs" />
+    <Compile Include="Protocol\AcmeHeader.cs" />
+    <Compile Include="Protocol\AuthorizationRequest.cs" />
+    <Compile Include="Protocol\AuthorizationResponse.cs" />
+    <Compile Include="Protocol\CertificateRequest.cs" />
+    <Compile Include="Protocol\CertificateResponse.cs" />
+    <Compile Include="Protocol\ChallangeRequest.cs" />
+    <Compile Include="Protocol\Challenge.cs" />
+    <Compile Include="Protocol\Directory.cs" />
+    <Compile Include="Protocol\Error.cs" />
+    <Compile Include="Protocol\Identifier.cs" />
+    <Compile Include="Protocol\PendingChallenge.cs" />
+    <Compile Include="Protocol\Problem.cs" />
+    <Compile Include="Protocol\RegistrationRequest.cs" />
+    <Compile Include="Protocol\RegistrationResponse.cs" />
+    <Compile Include="Protocol\ValidationRecord.cs" />
+    <Compile Include="Jose\JWS.cs" />
+    <Compile Include="Jose\JWSHeader.cs" />
+    <Compile Include="Jose\JWSMessage.cs" />
+    <Compile Include="Jose\JsonWebKey.cs" />
+    <Compile Include="Client\AcmeClient.cs" />
+    <Compile Include="Client\AcmeException.cs" />
+    <Compile Include="Client\IAcmeClient.cs" />
+    <Compile Include="Client\IChallengeProvider.cs" />
+    <Compile Include="Client\ManualChallengeProvider.cs" />
+    <Compile Include="Client\ManualServerConfigurationPRovider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Oocx.ACME.Common\Oocx.ACME.Common.csproj">
+      <Project>{624AAC5A-A6AC-458C-9EFF-58D17BCAA456}</Project>
+      <Name>Oocx.ACME.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Oocx.Asn1PKCS\Oocx.Asn1PKCS.csproj">
+      <Project>{8A2689EC-96FD-4A7D-A910-61081174A594}</Project>
+      <Name>Oocx.Asn1PKCS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

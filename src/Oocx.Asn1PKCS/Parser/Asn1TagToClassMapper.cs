@@ -7,7 +7,7 @@ namespace Oocx.Asn1PKCS.Parser
 {
     public class Asn1TagToClassMapper
     {
-        private Dictionary<int, Type> map = new Dictionary<int, Type>();
+        //private Dictionary<int, Type> map = new Dictionary<int, Type>();
 
         public Asn1TagToClassMapper()
         {

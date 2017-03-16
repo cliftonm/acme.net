@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CEBF984C-5D04-4B9F-9037-FAD73A8DB0E1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Oocx.ACME.Console</RootNamespace>
+    <AssemblyName>Oocx.ACME.Console</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AcmeProcess.cs" />
+    <Compile Include="ContainerConfiguration.cs" />
+    <Compile Include="IAcmeProcess.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\launchSettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CommandLineParser.2.0.275-beta\lib\net45\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Web.Administration.7.0.0.0\lib\net20\Microsoft.Web.Administration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Net" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Oocx.Asn1PKCS\Oocx.Asn1PKCS.csproj">
+      <Project>{8A2689EC-96FD-4A7D-A910-61081174A594}</Project>
+      <Name>Oocx.Asn1PKCS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Oocx.ACME.Common\Oocx.ACME.Common.csproj">
+      <Project>{624AAC5A-A6AC-458C-9EFF-58D17BCAA456}</Project>
+      <Name>Oocx.ACME.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Oocx.ACME\Oocx.ACME.csproj">
+      <Project>{AE526AAF-CECB-4244-A202-1CE255DFCEF1}</Project>
+      <Name>Oocx.ACME</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Oocx.ACME.IIS\Oocx.ACME.IIS.csproj">
+      <Project>{471D797F-4454-4A39-824E-35F448C00522}</Project>
+      <Name>Oocx.ACME.IIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Oocx.ACME.Xsp\Oocx.ACME.Xsp.csproj">
+      <Project>{0545BC88-A210-485D-94EC-38A29796D037}</Project>
+      <Name>Oocx.ACME.Xsp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -58,7 +58,7 @@ using your@email.com as registration contact information (-m):
 acme.exe -a www.yourdomain.com -m mailto:your@email.com -c manual-http-01 -i manual
 ```
 
-If something does not work, please contact me at mathias@raacke.info or submit an issue on GitHub. You
+If something does not work, please submit an issue on GitHub. You
 can increase the output verbosity by using the parameter -v Verbose
 
 # Projects in this repository
